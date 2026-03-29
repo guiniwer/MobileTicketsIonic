@@ -1,0 +1,48 @@
+.senha-atual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    text-align: center;
+
+    margin: 20px auto 0;
+
+    font-size: 24px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    width: 100%;
+    max-width: 400px;
+}
+
+.chamar-senha {
+    width: 60%;
+    height: 10%;
+    
+    
+    display: flex;
+    margin: 0 auto;
+    align-items: center;
+
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+
+
+.next-senha {
+    
+    margin-top: 20px;
+    padding: 20px 20px;
+    font-size: 18px;
+    border: none;
+    
+    height: 90px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.5s ease;
+}
+.next-senha:hover {
+    transform: scale(1.1);
+}
+    

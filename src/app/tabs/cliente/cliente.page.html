@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Retirar Senha</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-button class="button-senha"
+    expand="block"
+    color="danger"
+    (click)="gerarSenha('SP')">
+    Senha Prioritária (SP)
+  </ion-button>
+
+  <ion-button class="button-senha"
+    expand="block"
+    color="warning"
+    (click)="gerarSenha('SG')">
+    Senha Geral (SG)
+  </ion-button>
+
+  <ion-button class="button-senha"
+    expand="block"
+    color="success"
+    (click)="gerarSenha('SE')">
+    Retirada de Exames (SE)
+  </ion-button>
+
+</ion-content>

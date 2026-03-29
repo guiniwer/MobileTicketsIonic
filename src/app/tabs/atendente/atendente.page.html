@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Atendimento</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-button expand="block" (click)="chamarSenha()" class="chamar-senha">
+    Chamar próxima senha
+  </ion-button>
+
+  <ion-card *ngIf="senhaAtual">
+    <ion-card-header>
+      <ion-card-title>
+        {{ senhaAtual.numero }}
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p>Tipo: {{ senhaAtual.tipo }}</p>
+      <p>Guichê: {{ senhaAtual.guiche }}</p>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>
