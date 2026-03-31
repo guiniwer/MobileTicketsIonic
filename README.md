@@ -26,19 +26,19 @@ O painel exibe a senha chamada e o guichê
 📌 Cliente
 Área onde o usuário retira sua senha.
 
-![Cliente](src/assets/img/cliente.png)
+![Cliente](src/assets/img/Cliente.png)
 
 
 📌 Painel
 Exibe as últimas senhas chamadas pelo sistema.
 
-![Painel](src/assets/img/painel.png)
+![Painel](src/assets/img/Painel.png)
 
 
 📌 Atendente
 Interface onde o atendente chama as senhas.
 
-![Atendente](src/assets/img/atendente.png)
+![Atendente](src/assets/img/Atendente.png)
 
 
 🛠️ Tecnologias Utilizadas
