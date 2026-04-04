@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { ToastController } from '@ionic/angular';
 import { FilaService } from 'src/app/services/fila.service';
 
 @Component({
@@ -7,14 +8,21 @@ import { FilaService } from 'src/app/services/fila.service';
   styleUrls: ['./cliente.page.scss'],
   standalone: false
 })
-export class ClientePage implements OnInit {
+export class ClientePage {
 
-  constructor(private filaService: FilaService) { }
+  constructor(
+    private filaService: FilaService,
+    private toastController: ToastController
+  ) { }
 
-  ngOnInit() { }
-
-  gerarSenha(tipo: 'SP' | 'SG' | 'SE') {
+  async gerarSenha(tipo: 'SP' | 'SG' | 'SE') {
     const senha = this.filaService.adicionarSenha(tipo);
-    alert(`Senha gerada: ${senha.numero}`);
+    const toast = await this.toastController.create({
+      message: `Senha gerada: ${senha.numero}`,
+      duration: 3000,
+      position: 'top',
+      color: 'success'
+    });
+    await toast.present();
   }
 }
