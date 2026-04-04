@@ -2,10 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
 
-import { Senha } from '../models/senha.model';
-
-
-
 const routes: Routes = [
   {
     path: 'tabs',
