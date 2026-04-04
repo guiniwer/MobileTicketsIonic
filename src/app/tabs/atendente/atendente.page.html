@@ -18,9 +18,15 @@
     </ion-card-header>
 
     <ion-card-content>
-      <p>Tipo: {{ senhaAtual.tipo }}</p>
+      <p>
+        Tipo: <span [style.color]="corTipo(senhaAtual.tipo)" style="font-weight: 700">{{ senhaAtual.tipo }}</span>
+      </p>
       <p>Guichê: {{ senhaAtual.guiche }}</p>
     </ion-card-content>
   </ion-card>
+
+  <p *ngIf="!senhaAtual && jaChamou" class="ion-text-center ion-padding">
+    Nenhuma senha na fila.
+  </p>
 
 </ion-content>
