@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>painel</ion-title>
+    <ion-title>Painel</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -8,22 +8,25 @@
 
   <h2 class="ultimas-senhas">Últimas Senhas Chamadas</h2>
 
-  <div class="botoes-senha">
-    <button (click)="chamarProximaSenha()">
-      Chamar próxima senha
-    </button>
-  </div>
+  <ion-button expand="block" (click)="chamarProximaSenha()" class="chamar-senha">
+    Chamar próxima senha
+  </ion-button>
 
-
-  <ion-list>
+  <ion-list *ngIf="senhasChamadas.length > 0">
     <ion-item *ngFor="let senha of senhasChamadas">
       <ion-label>
         <h3>{{ senha.numero }}</h3>
-        <p>Tipo: {{ senha.tipo }}</p>
-        <p id="guiche">Guichê: {{ senha.guiche }}</p>
+        <p>
+          Tipo: <span class="tipo-badge" [style.color]="corTipo(senha.tipo)">{{ senha.tipo }}</span>
+        </p>
+        <p class="guiche">Guichê: {{ senha.guiche }}</p>
       </ion-label>
+      <ion-note slot="end" class="tempo">{{ tempoDecorrido(senha) }}</ion-note>
     </ion-item>
   </ion-list>
 
+  <p *ngIf="senhasChamadas.length === 0" class="ion-text-center ion-padding">
+    Nenhuma senha chamada ainda.
+  </p>
 
 </ion-content>

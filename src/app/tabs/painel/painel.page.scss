@@ -1,31 +1,23 @@
 .ultimas-senhas {
-    color: rgb(80, 135, 238);
-    padding-bottom: 20px;
-    text-align: center;
-    margin: 0 auto;
+  color: var(--ion-color-primary);
+  padding-bottom: 20px;
+  text-align: center;
+  margin: 0 auto;
 }
 
-#guiche {
-    color: rgb(80, 135, 238);
+.guiche {
+  color: var(--ion-color-primary);
 }
 
-.botoes-senha {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
+.chamar-senha {
   margin-bottom: 20px;
 }
 
-.botoes-senha button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #2d2d2d;
-  color: white;
-  transition: 0.2s;
+.tipo-badge {
+  font-weight: 700;
 }
 
-.botoes-senha button:hover {
-  transform: scale(1.05);
+.tempo {
+  font-size: 12px;
+  align-self: center;
 }
