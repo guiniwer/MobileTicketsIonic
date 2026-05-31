@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ToastController } from '@ionic/angular';
 import { FilaService } from 'src/app/services/fila.service';
 import { Senha } from 'src/app/models/senha.model';
 
@@ -13,18 +14,48 @@ export class AtendentePage {
   senhaAtual: Senha | null = null;
   jaChamou = false;
 
-  constructor(private filaService: FilaService) { }
+  constructor(
+    private filaService: FilaService,
+    private toastController: ToastController
+  ) { }
 
   chamarSenha() {
-    this.senhaAtual = this.filaService.chamarProxima();
-    this.jaChamou = true;
+    this.filaService.chamarProxima().subscribe({
+      next: async (senha) => {
+        this.senhaAtual = senha;
+        this.jaChamou = true;
 
-    if (this.senhaAtual) {
-      // Aguarda breve atualização do DOM antes de tocar o áudio
-      setTimeout(() => {
-        this.filaService.playSound();
-      }, 100);
-    }
+        if (this.senhaAtual) {
+          setTimeout(() => {
+            this.filaService.playSound();
+          }, 100);
+        } else {
+          const toast = await this.toastController.create({
+            message: 'Não há senha disponível para atendimento ou uma senha foi descartada.',
+            duration: 3000,
+            position: 'top',
+            color: 'warning'
+          });
+
+          await toast.present();
+        }
+      },
+      error: async (erro) => {
+        this.senhaAtual = null;
+        this.jaChamou = true;
+
+        const mensagem = erro?.error?.mensagem ?? 'Erro ao chamar senha. Verifique se a API está rodando.';
+
+        const toast = await this.toastController.create({
+          message: mensagem,
+          duration: 3500,
+          position: 'top',
+          color: 'danger'
+        });
+
+        await toast.present();
+      }
+    });
   }
 
   corTipo(tipo: string): string {

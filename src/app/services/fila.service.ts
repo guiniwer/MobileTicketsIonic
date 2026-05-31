@@ -1,14 +1,25 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map, tap } from 'rxjs';
 import { Senha } from '../models/senha.model';
 
-const STORAGE_KEY = 'filaService';
-
-interface FilaState {
-  filaSP: Senha[];
-  filaSG: Senha[];
-  filaSE: Senha[];
+interface FilaApiState {
+  expedienteAberto: boolean;
+  filas: {
+    SP: Senha[];
+    SG: Senha[];
+    SE: Senha[];
+  };
   senhasChamadas: Senha[];
+  historico: Senha[];
   contadores: Record<string, number>;
+  ultimoGrupoChamado: 'SP' | 'NAO_SP' | null;
+}
+
+interface ChamarSenhaResponse {
+  mensagem: string;
+  senha: Senha | null;
+  senhaDescartada?: Senha;
 }
 
 @Injectable({
@@ -16,73 +27,57 @@ interface FilaState {
 })
 export class FilaService {
 
-  private readonly TOTAL_GUICHES = 5;
+  private readonly API_URL = 'http://localhost:3000';
 
   filaSP: Senha[] = [];
   filaSG: Senha[] = [];
   filaSE: Senha[] = [];
-
   senhasChamadas: Senha[] = [];
 
-  private filas: Record<string, Senha[]> = {};
-  private contadores: Record<string, number> = { SP: 0, SG: 0, SE: 0 };
-
-  constructor() {
-    this.filas = { SP: this.filaSP, SG: this.filaSG, SE: this.filaSE };
-    this.carregarState();
+  constructor(private http: HttpClient) {
+    this.carregarDados();
   }
 
-  adicionarSenha(tipo: 'SP' | 'SG' | 'SE'): Senha {
-    const novaSenha: Senha = {
-      numero: this.gerarNumero(tipo),
-      tipo,
-      status: 'fila',
-      horaEmissao: new Date()
-    };
-
-    this.filas[tipo].push(novaSenha);
-    this.salvarState();
-
-    return novaSenha;
+  carregarDados(): void {
+    this.http.get<FilaApiState>(`${this.API_URL}/senhas`).subscribe({
+      next: (state) => this.atualizarEstadoLocal(state),
+      error: (erro) => console.error('Erro ao carregar dados da API:', erro)
+    });
   }
 
-  chamarProxima(): Senha | null {
-    let senha: Senha | undefined;
-
-    if (this.filaSP.length > 0) senha = this.filaSP.shift();
-    else if (this.filaSE.length > 0) senha = this.filaSE.shift();
-    else if (this.filaSG.length > 0) senha = this.filaSG.shift();
-
-    if (!senha) return null;
-
-    senha.status = 'atendida';
-    senha.horaAtendimento = new Date();
-    senha.guiche = String(Math.floor(Math.random() * this.TOTAL_GUICHES) + 1).padStart(2, '0');
-
-    this.senhasChamadas.unshift(senha);
-    this.salvarState();
-
-    return senha;
+  adicionarSenha(tipo: 'SP' | 'SG' | 'SE'): Observable<Senha> {
+    return this.http.post<Senha>(`${this.API_URL}/senhas`, { tipo }).pipe(
+      tap(() => this.carregarDados())
+    );
   }
 
-  private gerarNumero(tipo: 'SP' | 'SG' | 'SE'): string {
-    const data = new Date();
+  chamarProxima(): Observable<Senha | null> {
+    return this.http.post<ChamarSenhaResponse>(`${this.API_URL}/senhas/chamar-proxima`, {}).pipe(
+      tap(() => this.carregarDados()),
+      map((resposta) => resposta.senha)
+    );
+  }
 
-    const yy = String(data.getFullYear()).slice(2);
-    const mm = String(data.getMonth() + 1).padStart(2, '0');
-    const dd = String(data.getDate()).padStart(2, '0');
+  carregarPainel(): Observable<Senha[]> {
+    return this.http.get<{ senhasChamadas: Senha[] }>(`${this.API_URL}/painel`).pipe(
+      map((resposta) => resposta.senhasChamadas),
+      tap((senhas) => {
+        this.senhasChamadas = senhas;
+      })
+    );
+  }
 
-    this.contadores[tipo]++;
-    const seq = String(this.contadores[tipo]).padStart(2, '0');
-
-    return `${yy}${mm}${dd}-${tipo}${seq}`;
+  private atualizarEstadoLocal(state: FilaApiState): void {
+    this.filaSP = state.filas.SP ?? [];
+    this.filaSG = state.filas.SG ?? [];
+    this.filaSE = state.filas.SE ?? [];
+    this.senhasChamadas = state.senhasChamadas ?? [];
   }
 
   playSound(): void {
     const ctx = new AudioContext();
     const now = ctx.currentTime;
 
-    // Chime suave com 3 notas harmônicas (Dó - Mi - Sol)
     const notas = [523.25, 659.25, 783.99];
     const duracao = 0.6;
     let ultimoStop = now;
@@ -100,7 +95,6 @@ export class FilaService {
       const inicio = now + i * 0.15;
       const fim = inicio + duracao;
 
-      // Envelope suave: fade in rápido + fade out gradual
       gain.gain.setValueAtTime(0, inicio);
       gain.gain.linearRampToValueAtTime(0.15, inicio + 0.05);
       gain.gain.exponentialRampToValueAtTime(0.001, fim);
@@ -112,29 +106,5 @@ export class FilaService {
     }
 
     setTimeout(() => ctx.close(), (ultimoStop - now) * 1000 + 100);
-  }
-
-  private salvarState(): void {
-    const state: FilaState = {
-      filaSP: this.filaSP,
-      filaSG: this.filaSG,
-      filaSE: this.filaSE,
-      senhasChamadas: this.senhasChamadas,
-      contadores: this.contadores
-    };
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }
-
-  private carregarState(): void {
-    const data = sessionStorage.getItem(STORAGE_KEY);
-    if (!data) return;
-
-    const state: FilaState = JSON.parse(data);
-
-    this.filaSP.push(...state.filaSP);
-    this.filaSG.push(...state.filaSG);
-    this.filaSE.push(...state.filaSE);
-    this.senhasChamadas.push(...state.senhasChamadas);
-    this.contadores = state.contadores;
   }
 }

@@ -1,0 +1,15 @@
+{
+  "name": "api-mobile-tickets",
+  "version": "1.0.0",
+  "description": "API REST em memória para integração com o app MobileTicketsIonic",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "start:teste": "IGNORAR_HORARIO=true node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.3"
+  }
+}

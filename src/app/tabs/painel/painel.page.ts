@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FilaService } from 'src/app/services/fila.service';
 import { Senha } from 'src/app/models/senha.model';
 
@@ -8,12 +8,25 @@ import { Senha } from 'src/app/models/senha.model';
   styleUrls: ['./painel.page.scss'],
   standalone: false
 })
-export class PainelPage {
+export class PainelPage implements OnInit, OnDestroy {
+
+  private intervaloAtualizacao?: ReturnType<typeof setInterval>;
 
   constructor(private filaService: FilaService) {}
 
+  ngOnInit(): void {
+    this.atualizarPainel();
+    this.intervaloAtualizacao = setInterval(() => this.atualizarPainel(), 5000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.intervaloAtualizacao) {
+      clearInterval(this.intervaloAtualizacao);
+    }
+  }
+
   get senhasChamadas(): Senha[] {
-    return this.filaService.senhasChamadas;
+    return this.filaService.senhasChamadas.slice(0, 5);
   }
 
   get filaSP(): Senha[] {
@@ -29,7 +42,16 @@ export class PainelPage {
   }
 
   chamarProximaSenha() {
-    this.filaService.chamarProxima();
+    this.filaService.chamarProxima().subscribe({
+      next: () => this.atualizarPainel(),
+      error: (erro) => console.error('Erro ao chamar próxima senha:', erro)
+    });
+  }
+
+  private atualizarPainel(): void {
+    this.filaService.carregarPainel().subscribe({
+      error: (erro) => console.error('Erro ao atualizar painel:', erro)
+    });
   }
 
   tempoDecorrido(senha: Senha): string {
